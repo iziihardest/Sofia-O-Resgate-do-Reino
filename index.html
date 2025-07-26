@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Isaac e a Princesa Sofia</title>
+  <style>
+    body {
+      margin: 0;
+      background: #222;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #000;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+  <h1>Isaac e a Princesa Sofia: A Sombra do Reino</h1>
+  <canvas id="game" width="256" height="240"></canvas>
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    let isaac = { x: 50, y: 100, w: 16, h: 16, color: "brown" };
+    let enemy = { x: 180, y: 100, w: 16, h: 16, color: "darkred", alive: true };
+    let sword = false;
+    let gameEnded = false;
+
+    function drawRect(obj) {
+      ctx.fillStyle = obj.color;
+      ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawRect(isaac);
+      if (enemy.alive) drawRect(enemy);
+      if (sword) {
+        ctx.fillStyle = "silver";
+        ctx.fillRect(isaac.x + isaac.w, isaac.y + 4, 8, 4);
+      }
+    }
+
+    function checkCollision(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function update() {
+      if (sword && enemy.alive && checkCollision({x: isaac.x + isaac.w, y: isaac.y + 4, w: 8, h: 4}, enemy)) {
+        enemy.alive = false;
+        setTimeout(() => {
+          gameEnded = true;
+          alert("Princesa Sofia: Isaac, você me salvou... Eu te amo!");
+        }, 300);
+      }
+    }
+
+    document.addEventListener("keydown", e => {
+      if (gameEnded) return;
+      switch(e.key) {
+        case "ArrowRight": isaac.x += 5; break;
+        case "ArrowLeft": isaac.x -= 5; break;
+        case "ArrowUp": isaac.y -= 5; break;
+        case "ArrowDown": isaac.y += 5; break;
+        case " ": sword = true; break;
+      }
+      update();
+      draw();
+    });
+
+    document.addEventListener("keyup", e => {
+      if (e.key === " ") sword = false;
+    });
+
+    draw();
+  </script>
+</body>
+</html>
